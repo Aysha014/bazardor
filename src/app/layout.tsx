@@ -26,7 +26,6 @@ export default function RootLayout({
         <Navbar />
         <Navlinks />
 
-
         <main className="flex-1">{children}</main>
 
         <footer>Footer</footer>
