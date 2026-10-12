@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,25 +21,25 @@ export default function Navbar({ user = null }: NavbarProps) {
   return (
     <header className="w-full border-b border-gray-200 bg-[#F0F5F0]">
       {/* Top navigation */}
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+      <div className="mx-auto flex w-full max-w-225 items-center justify-between px-4 py-3">
         {/* Logo and date */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-700">
             <Image
               src="/logo-icon.png"
               alt="BazarDor logo"
-              width={16}
-              height={16}
+              width={20}
+              height={20}
               className="object-contain"
               priority
             />
           </div>
 
           <div>
-            <h1 className="text-sm font-extrabold leading-tight text-gray-900">
+            <h1 className="text-base font-extrabold leading-tight text-gray-900">
               বাজার দর
             </h1>
-            <p className="mt-0.5 text-[10px] text-black">
+            <p className="mt-0.5 text-[11px] text-black">
               {banglaDate}
             </p>
           </div>
