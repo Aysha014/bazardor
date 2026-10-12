@@ -1,22 +1,93 @@
-import Link from "next/link";
+"use client";
 
-export default function Navbar() {
+import Link from "next/link";
+import Image from "next/image";
+import { ChevronDown } from "lucide-react";
+
+type NavbarProps = {
+  user?: {
+    name: string;
+    image?: string;
+  } | null;
+};
+
+export default function Navbar({ user = null }: NavbarProps) {
+  const banglaDate = new Intl.DateTimeFormat("bn-BD", {
+    dateStyle: "full",
+    timeZone: "Asia/Dhaka",
+  }).format(new Date());
+
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-lg font-bold text-gray-900">
-          বাজার দর
+    <header className="w-full border-b border-gray-200 bg-[#F0F5F0]">
+      {/* Top navigation */}
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        {/* Logo and date */}
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-700">
+            <Image
+              src="/logo-icon.png"
+              alt="BazarDor logo"
+              width={16}
+              height={16}
+              className="object-contain"
+              priority
+            />
+          </div>
+
+          <div>
+            <h1 className="text-sm font-extrabold leading-tight text-gray-900">
+              বাজার দর
+            </h1>
+            <p className="mt-0.5 text-[10px] text-black">
+              {banglaDate}
+            </p>
+          </div>
         </Link>
 
-        <div className="flex items-center gap-4 text-sm font-medium text-gray-700">
-          <Link href="/" className="transition hover:text-gray-900">
-            হোম
+        {/* Authentication / Profile */}
+        {user ? (
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-50"
+          >
+            {user.image ? (
+              <Image
+                src={user.image}
+                alt="Profile"
+                width={28}
+                height={28}
+                className="h-7 w-7 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-800">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <span className="hidden text-xs font-medium text-gray-700 sm:block">
+              {user.name}
+            </span>
+
+            <ChevronDown size={14} className="text-gray-500" />
           </Link>
-          <Link href="/prices" className="transition hover:text-gray-900">
-            দাম
-          </Link>
-        </div>
-      </nav>
+        ) : (
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href="/signin"
+              className="inline-flex items-center justify-center rounded-md border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-100"
+            >
+              সাইন ইন
+            </Link>
+
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-md bg-green-700 px-4 py-2 text-xs font-semibold text-white transition hover:bg-green-800"
+            >
+              সাইন আপ
+            </Link>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
