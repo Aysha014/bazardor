@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Navlinks from "@/components/Navlinks";
 import Marquee from "@/components/Marquee";
 import Footer from "@/components/footer";
+import ToastProvider from "@/components/ToastProvider";
 
 
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       className={`${notoSerifBengali.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#F0F5F0] text-black">
+        <ToastProvider />
         <Navbar />
         <Navlinks />
          <Marquee />

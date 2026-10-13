@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SigninPage() {
@@ -27,21 +28,32 @@ export default function SigninPage() {
 
       if (result.error) {
         console.error("Signin error:", result.error);
-        setError(result.error.message || "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।");
+
+        const message =
+          result.error.message || "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
+
+        setError(message);
+        toast.error(message);
         return;
       }
 
+      toast.success("সফলভাবে সাইন ইন হয়েছে!");
       router.push("/profile");
       router.refresh();
     } catch (err) {
       console.error("Signin exception:", err);
-      setError("একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+
+      const message = "একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSocialSignin(provider: "google" | "github") {
+  async function handleSocialSignin(
+    provider: "google" | "github"
+  ) {
     setError("");
     setSocialLoading(provider);
 
@@ -52,13 +64,28 @@ export default function SigninPage() {
       });
 
       if (result.error) {
-        console.error(`${provider} signin error:`, result.error);
-        setError(result.error.message || "সোশ্যাল সাইন-ইন করা যায়নি।");
+        console.error(
+          `${provider} signin error details:`,
+          JSON.stringify(result.error, Object.getOwnPropertyNames(result.error), 2)
+        );
+
+        const message =
+          result.error.message || "সোশ্যাল সাইন-ইন করা যায়নি।";
+
+        setError(message);
+        toast.error(message);
         setSocialLoading("");
+        return;
       }
+
+      // On success, the auth client normally redirects to the provider.
+      // The callback URL returns the user to /profile.
     } catch (err) {
       console.error(`${provider} signin exception:`, err);
-      setError("একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+
+      const message = "একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+      setError(message);
+      toast.error(message);
       setSocialLoading("");
     }
   }
@@ -110,7 +137,7 @@ export default function SigninPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="কমপক্ষে ৮ অক্ষর"
+              placeholder="আপনার পাসওয়ার্ড লিখুন"
               autoComplete="current-password"
               required
               className="h-10.5 w-full rounded-lg border border-[#DDE7DE] bg-transparent px-3 text-sm outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-100"
@@ -127,7 +154,10 @@ export default function SigninPage() {
           </div>
 
           {error && (
-            <p role="alert" className="text-sm leading-5 text-red-600">
+            <p
+              role="alert"
+              className="text-sm leading-5 text-red-600"
+            >
               {error}
             </p>
           )}
@@ -152,17 +182,38 @@ export default function SigninPage() {
             type="button"
             onClick={() => handleSocialSignin("google")}
             disabled={loading || !!socialLoading}
-            className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#DDE7DE] bg-white px-2 py-3 text-xs font-semibold text-[#26332A] transition hover:bg-gray-50 disabled:opacity-60"
+            className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#DDE7DE] bg-white px-2 py-3 text-xs font-semibold text-[#26332A] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <svg viewBox="0 0 48 48" className="h-4 w-4 shrink-0" aria-hidden="true">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" transform="translate(0 5)" />
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.06 46.98 31.86 46.98 24.55Z" />
-              <path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.2a23.9 23.9 0 0 0 0 21.58l7.98-6.2Z" transform="translate(0 5)" />
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.2C6.51 42.62 14.62 48 24 48Z" transform="translate(0 -2)" />
+            <svg
+              viewBox="0 0 48 48"
+              className="h-4 w-4 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+                transform="translate(0 5)"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.06 46.98 31.86 46.98 24.55Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.2a23.9 23.9 0 0 0 0 21.58l7.98-6.2Z"
+                transform="translate(0 5)"
+              />
+              <path
+                fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.2C6.51 42.62 14.62 48 24 48Z"
+                transform="translate(0 -2)"
+              />
             </svg>
 
             <span className="truncate">
-              {socialLoading === "google" ? "অপেক্ষা করুন..." : "Google দিয়ে চালিয়ে যান"}
+              {socialLoading === "google"
+                ? "অপেক্ষা করুন..."
+                : "Google দিয়ে চালিয়ে যান"}
             </span>
           </button>
 
@@ -170,14 +221,20 @@ export default function SigninPage() {
             type="button"
             onClick={() => handleSocialSignin("github")}
             disabled={loading || !!socialLoading}
-            className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#DDE7DE] bg-white px-2 py-3 text-xs font-semibold text-[#26332A] transition hover:bg-gray-50 disabled:opacity-60"
+            className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#DDE7DE] bg-white px-2 py-3 text-xs font-semibold text-[#26332A] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 fill-current" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4 shrink-0 fill-current"
+              aria-hidden="true"
+            >
               <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.92.1-.72.39-1.21.71-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.29-2.61 5.23-5.1 5.51.4.35.76 1.03.76 2.08v3.08c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z" />
             </svg>
 
             <span className="truncate">
-              {socialLoading === "github" ? "অপেক্ষা করুন..." : "GitHub দিয়ে চালিয়ে যান"}
+              {socialLoading === "github"
+                ? "অপেক্ষা করুন..."
+                : "GitHub দিয়ে চালিয়ে যান"}
             </span>
           </button>
         </div>
