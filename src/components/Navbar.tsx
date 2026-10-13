@@ -1,18 +1,144 @@
-
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronDown, LogOut, User } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
-type NavbarProps = {
-  user?: {
-    name: string;
-    image?: string;
-  } | null;
+type NavUser = {
+  name: string;
+  email: string;
+  image?: string;
 };
 
-export default function Navbar({ user = null }: NavbarProps) {
+function Avatar({ user, size }: { user: NavUser; size: number }) {
+  if (user.image) {
+    return (
+      <Image
+        src={user.image}
+        alt="Profile"
+        width={size}
+        height={size}
+        style={{ width: size, height: size }}
+        className="rounded-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{ width: size, height: size }}
+      className="flex items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-800"
+    >
+      {user.name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function ProfileMenu({ user }: { user: NavUser }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click and on Escape
+  useEffect(() => {
+    if (!open) return;
+
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  async function handleSignOut() {
+    setOpen(false);
+    await authClient.signOut();
+    router.push("/signin");
+    router.refresh();
+  }
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-50"
+      >
+        <Avatar user={user} size={28} />
+
+        <span className="hidden text-xs font-medium text-gray-700 sm:block">
+          {user.name}
+        </span>
+
+        <ChevronDown
+          size={14}
+          className={`text-gray-500 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-3 w-72 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl"
+        >
+          <p className="truncate text-base font-bold text-gray-900">
+            {user.name}
+          </p>
+          <p className="mb-4 truncate text-sm text-gray-500">{user.email}</p>
+
+          <Link
+            href="/profile"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-md py-2 text-sm text-gray-800 hover:text-green-700"
+          >
+            <User size={16} />
+            আমার প্রোফাইল
+          </Link>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={handleSignOut}
+            className="flex w-full items-center gap-2 rounded-md py-2 text-sm text-red-600 hover:text-red-700"
+          >
+            <LogOut size={16} />
+            সাইন আউট
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Navbar() {
+  const { data: session } = authClient.useSession();
+
+  const user: NavUser | null = session?.user
+    ? {
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image ?? undefined,
+      }
+    : null;
+
   const banglaDate = new Intl.DateTimeFormat("bn-BD", {
     dateStyle: "full",
     timeZone: "Asia/Dhaka",
@@ -39,38 +165,13 @@ export default function Navbar({ user = null }: NavbarProps) {
             <h1 className="text-base font-extrabold leading-tight text-gray-900">
               বাজার দর
             </h1>
-            <p className="mt-0.5 text-[11px] text-black">
-              {banglaDate}
-            </p>
+            <p className="mt-0.5 text-[11px] text-black">{banglaDate}</p>
           </div>
         </Link>
 
         {/* Authentication / Profile */}
         {user ? (
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-50"
-          >
-            {user.image ? (
-              <Image
-                src={user.image}
-                alt="Profile"
-                width={28}
-                height={28}
-                className="h-7 w-7 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-800">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-
-            <span className="hidden text-xs font-medium text-gray-700 sm:block">
-              {user.name}
-            </span>
-
-            <ChevronDown size={14} className="text-gray-500" />
-          </Link>
+          <ProfileMenu user={user} />
         ) : (
           <div className="flex items-center gap-3">
             <Link
