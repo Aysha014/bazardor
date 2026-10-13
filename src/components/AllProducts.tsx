@@ -4,7 +4,10 @@ import type { Product } from "@/lib/products";
 
 export default function AllProducts({ products }: { products: Product[] }) {
   return (
-    <section className="mt-7 pb-10">
+    <section
+      id="সব-পণ্য"
+      className="mt-7 scroll-mt-6 pb-10"
+    >
       <h2 className="text-base font-bold text-gray-800">সব পণ্য</h2>
 
       <p className="mb-3 mt-2 text-xs text-gray-500">

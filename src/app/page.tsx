@@ -1,5 +1,3 @@
-
-import Marquee from "@/components/Marquee";
 import HeroSection from "@/components/HeroSection";
 import PriceSection from "@/components/PriceSection";
 import AllProducts from "@/components/AllProducts";
@@ -35,7 +33,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Marquee />
+     
 
       <div className="min-h-screen bg-[#F0F5F0]">
         <div className="mx-auto w-full max-w-225 px-4">

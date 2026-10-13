@@ -16,3 +16,20 @@ export type Product = {
     pct: number;
   };
 };
+
+
+export type MarketPrice = {
+  market: string;
+  division: string;
+  min: number;
+  max: number;
+  avg: number;
+};
+
+export type ProductDetail = Product & {
+  slug: string;
+  category: string;
+  yesterday: number;
+  summary?: string;
+  markets: MarketPrice[];
+};
